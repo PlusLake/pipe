@@ -2,13 +2,17 @@ package io.github.pluslake.pipe.exception;
 
 import java.util.function.*;
 
+/**
+ * A helper Class for handling checked execption.
+ * This class is not supposed to use from outside of the StreamPipe library.
+ */
 public class Try {
     public static <T> Consumer<T> consumer(CheckedConsumer<T> consumer) {
         return t -> {
             try {
                 consumer.accept(t);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new PipeException(e);
             }
         };
     }
@@ -18,7 +22,7 @@ public class Try {
             try {
                 return supplier.get();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new PipeException(e);
             }
         };
     }
@@ -28,7 +32,7 @@ public class Try {
             try {
                 supplier.get();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new PipeException(e);
             }
         };
     }
@@ -38,7 +42,7 @@ public class Try {
             try {
                 runnable.run();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new PipeException(e);
             }
         };
     }
@@ -48,7 +52,7 @@ public class Try {
             try {
                 return function.apply(t);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new PipeException(e);
             }
         };
     }
