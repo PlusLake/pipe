@@ -9,6 +9,12 @@ import java.util.stream.*;
 
 import io.github.pluslake.pipe.exception.Try;
 
+/**
+ * A Pipeline executor that executes multiple chained {@link StreamProcessor} interface.
+ * 
+ * @see StreamPipe#run()
+ * @see StreamProcessor
+ */
 public class StreamPipe {
 
     private final StreamProcessor[] processors;
@@ -62,10 +68,22 @@ public class StreamPipe {
         };
     }
 
+    /**
+     * Create a StreamPipe containing multiple StreamProcessors.
+     * 
+     * @param processors an array of StreamProcessors
+     * @return a StreamPipe instance that is ready to run
+     */
     public static StreamPipe of(StreamProcessor... processors) {
         return new StreamPipe(processors);
     }
 
+    /**
+     * Create a StreamPipe containing multiple StreamProcessors.
+     * 
+     * @param processors an list of StreamProcessors
+     * @return a StreamPipe instance that is ready to run
+     */
     public static StreamPipe of(List<StreamProcessor> processors) {
         return new StreamPipe(processors.toArray(StreamProcessor[]::new));
     }
