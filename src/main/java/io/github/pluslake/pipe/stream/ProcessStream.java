@@ -3,19 +3,19 @@ package io.github.pluslake.pipe.stream;
 import java.io.*;
 import java.util.List;
 
-import io.github.pluslake.pipe.*;
+import io.github.pluslake.pipe.StreamProcessor;
 import io.github.pluslake.pipe.exception.Try;
 
 /**
  * A reference implementation of StreamProcessor for calling external processes. 3 threads will be
  * created to:
- * <li> Reading InputStream from upstream Stream and pass to the process
- * <li> Redirecting stdout of the process, to the OutputStream of downstream StreamProcessor
- * <li> Redirecting stderr of the process, to System.err
+ * <ul>
+ *   <li> Reading InputStream from upstream Stream and pass to the process </li>
+ *   <li> Redirecting stdout of the process, to the OutputStream of downstream StreamProcessor </li>
+ *   <li> Redirecting stderr of the process, to System.err </li>
+ * </ul>
  */
 public class ProcessStream implements StreamProcessor {
-    private int bufferSize = 1024;
-
     private final ProcessBuilder builder;
 
     private ProcessStream(ProcessBuilder builder) {
@@ -23,7 +23,10 @@ public class ProcessStream implements StreamProcessor {
     }
 
     private Thread thread(InputStream in, OutputStream out) {
-        return new Thread(Try.runnable(() -> StreamWriter.write(in, out, bufferSize)));
+        return new Thread(Try.runnable(() -> {
+            in.transferTo(out);
+            out.close();
+        }));
     }
 
     @Override
@@ -49,22 +52,12 @@ public class ProcessStream implements StreamProcessor {
     }
 
     /**
-     * Set the buffer size.
-     * 
-     * @throws IllegalArgumentException if the specified buffer size is negative.
-     */
-    public ProcessStream setBufferSize(int size) {
-        if (size < 1) {
-            String message = "The new buffer size must be greater than 0. Given: %d";
-            throw new IllegalArgumentException(String.format(message, size));
-        }
-        return this;
-    }
-
-    /**
      * Create a ProcessStream from list of arguments. The arguments will be used in
-     *  {@link ProcessBuilder#ProcessBuilder(List))} directly. See {@link ProcessStream}
+     *  {@link ProcessBuilder#ProcessBuilder(List)} directly. See {@link ProcessStream}
      * for details.
+     * 
+     * @param arguments the list containing the program and its arguments
+     * @return a ProcessStream instance
      */
     public static ProcessStream of(List<String> arguments) {
         return new ProcessStream(new ProcessBuilder(arguments));
@@ -74,6 +67,9 @@ public class ProcessStream implements StreamProcessor {
      * Create a ProcessStream from list of arguments. The arguments will be used in
      * {@link ProcessBuilder#ProcessBuilder(String...)} directly. See {@link ProcessStream}
      * for details.
+     * 
+     * @param arguments the list containing the program and its arguments
+     * @return a ProcessStream instance
      */
     public static ProcessStream of(String... arguments) {
         return new ProcessStream(new ProcessBuilder(arguments));
