@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import io.github.pluslake.pipe.stream.ProcessStream;
-import io.github.pluslake.pipe.stream.compression.GZipStreamProcessors;
+import io.github.pluslake.pipe.stream.compression.*;
 
 public class PipeTest {
 
@@ -43,6 +43,22 @@ public class PipeTest {
         List<Integer> result = StreamPipe.of(
                 ProcessStream.of("cat", fileInput),
                 GZipStreamProcessors.extract(),
+                ProcessStream.of("cp", "/dev/stdin", fileOutput)
+        ).run();
+        assertIterableEquals(List.of(0, 0, 0), result);
+        assertEquals(Files.readString(Path.of(fileInputPlain)), Files.readString(Path.of(fileOutput)));
+    }
+
+    /** Zip test  */
+    @Test
+    public void zip() throws IOException {
+        String fileInputPlain = "unit_test/in/fruits.txt";
+        String fileInputZipped = "unit_test/in/fruits.txt.zip";
+        String fileOutput = "unit_test/out/zip_test_output.txt";
+
+        List<Integer> result = StreamPipe.of(
+                ProcessStream.of("cat", fileInputZipped),
+                ZipStreamProcessors.extract(),
                 ProcessStream.of("cp", "/dev/stdin", fileOutput)
         ).run();
         assertIterableEquals(List.of(0, 0, 0), result);
