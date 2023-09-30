@@ -1,6 +1,11 @@
 plugins {
     id "java-library"
+    id "maven-publish"
+    id "signing"
 }
+
+group = "io.github.pluslake"
+version = "0.1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -14,4 +19,49 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "pipe"
+            from components.java
+            pom {
+                name = "StreamPipe"
+                url = "https://github.com/PlusLake/pipe"
+                licenses {
+                    license {
+                        name = "MIT License"
+                        url = "https://raw.githubusercontent.com/PlusLake/pipe/master/LICENSE"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "plus"
+                        name = "pluslake"
+                        email = "plus.lake.main@gmail.com"
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url = "https://oss.sonatype.org/content/repositories/snapshots"
+            credentials {
+                username = System.getenv("MAVEN_CENTRAL_USERNAME")
+                password = System.getenv("MAVEN_CENTRAL_PASSWORD")
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+task javadocLint(type: Javadoc) {
+    source = sourceSets.main.allJava
 }
