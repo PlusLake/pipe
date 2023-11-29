@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.pluslake"
-version = "0.1.0-SNAPSHOT"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
@@ -30,6 +30,7 @@ publishing {
             from components.java
             pom {
                 name = "StreamPipe"
+                description = "A library that provides unix-like pipeline."
                 url = "https://github.com/PlusLake/pipe"
                 licenses {
                     license {
@@ -44,16 +45,18 @@ publishing {
                         email = "plus.lake.main@gmail.com"
                     }
                 }
+                scm {
+                    connection = "scm:git:https://github.com/PlusLake/pipe"
+                    developerConnection = "scm:git:https://github.com/PlusLake/pipe"
+                    url = "https://github.com/PlusLake/pipe"
+                }
             }
         }
     }
     repositories {
         maven {
-            url = "https://oss.sonatype.org/content/repositories/snapshots"
-            credentials {
-                username = System.getenv("MAVEN_CENTRAL_USERNAME")
-                password = System.getenv("MAVEN_CENTRAL_PASSWORD")
-            }
+            name = "pipe"
+            url = layout.buildDirectory.dir("bundle")
         }
     }
 }
